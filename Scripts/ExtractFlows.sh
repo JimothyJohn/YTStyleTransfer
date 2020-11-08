@@ -1,10 +1,7 @@
 #!/bin/bash
 
-# Call with docker run --rm -it --gpus all -v $HOME/StyleTransfer:/input \
-#    -v /home/nick/github/flownet2-pytorch/:/MyFlownet \
-#    --shm-size=8gb flownet:v0
+# Run with $ docker exec --gpus all --rm -v `pwd`:/input --shm-size=8gb flownet:runtime ./ExtractFlows.sh
 
-### Python program to extract flows
 # Configure environment
 DIR=/input/
 
@@ -22,7 +19,7 @@ python3 ./main.py --inference --model FlowNet2 \
     --save_flow --save $DIR/flows \
     --inference_dataset ImagesFromFolder \
     --inference_dataset_root $DIR/.frames/ \
-    --resume $DIR/FlowNet2_checkpoint.pth.tar
+    --resume /flownet/FlowNet2_checkpoint.pth.tar
 
 # If frame directory exists
 if [[ -d "$DIR/motion" ]]
