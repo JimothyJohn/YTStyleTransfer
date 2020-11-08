@@ -1,0 +1,8 @@
+FROM nvcr.io/nvidia/tensorflow:20.03-tf1-py3
+
+RUN apt-get update
+RUN apt-get install -y libsm6 libxext6 libxrender-dev
+RUN pip install opencv-python tensorflow_hub Pillow matplotlib
+
+# Run with $ docker exec --gpus all --rm -v `pwd`:/input --shm-size=8gb magenta:runtime ./AddStyle.sh /input/SampleImages/vangogh.jpg
+# Troubleshoot with $ docker run --gpus all --rm -it -v $HOME/github/YTStyleTransfer:/input --shm-size=8gb magenta:dev

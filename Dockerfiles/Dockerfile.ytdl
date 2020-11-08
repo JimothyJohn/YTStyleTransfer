@@ -1,0 +1,11 @@
+# Vidslicer image
+FROM ubuntu:18.04
+
+RUN apt update
+RUN apt install -y curl python ffmpeg
+RUN curl -L https://yt-dl.org/downloads/latest/youtube-dl -o /usr/local/bin/youtube-dl
+RUN chmod a+rx /usr/local/bin/youtube-dl
+
+# Run with docker exec --rm -v `pwd`:/input vidslicer:runtime
+# Troubleshoot with docker run --rm -it -v $HOME/github/YTStyleTransfer:/input -e YT=https://www.youtube.com/watch?v=w-GYwUsbY3E -e START=2 -e END=3 vidslicer:dev
+# Test command $ /input/VidSlicer.sh $YT $START $END
