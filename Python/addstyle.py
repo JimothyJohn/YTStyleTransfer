@@ -54,19 +54,14 @@ parser.add_argument('--style', help='input file')
 args = parser.parse_args()
 
 # Directories
-CONTENT_PATH = '/input/.frames/'
+CONTENT_PATH = '/input/frames/'
 MASK_PATH = '/input/motion/'
-STYLIZED_PATH = '/input/stylized'
+STYLIZED_PATH = '/input/stylized/'
 
 # Flags
-MASKING = True
+MASKING = False
 
-if os.path.exists(STYLIZED_PATH):
-    shutil.rmtree(STYLIZED_PATH)
-    
-os.mkdir(STYLIZED_PATH)
-
-styleTensor = load_img('/input/style/'+args.style)
+styleTensor = load_img('/input/SampleImages/'+args.style+'.jpg')
 contentTensor = load_img(CONTENT_PATH+'clip.0001.png')
 _, height, width, _ = contentTensor.shape
 
@@ -75,19 +70,22 @@ hub_handle = 'https://tfhub.dev/google/magenta/arbitrary-image-stylization-v1-25
 hub_module = hub.load(hub_handle)
 
 lastImage = style_image(CONTENT_PATH+'clip.0001.png', styleTensor)
+lastImage.save('/input/stylized/stylized.0001.png')
 
 for idx, framePath in enumerate(sorted(os.listdir(CONTENT_PATH))):
+  if idx==0: continue # skip first frame
   styleImage = style_image(CONTENT_PATH+framePath, styleTensor).resize((width, height), Image.ANTIALIAS)
-  
-  if MASKING is True and os.path.exists(MASK_PATH+'motion.{:04d}.png'.format(idx)):
-      flow_img = Image.open(MASK_PATH+'motion.{:04d}.png'.format(idx))
-      #seg_img = Image.open('/input/segments/segment.0071.png')
+  try:
+    flowMask = Image.open(MASK_PATH+'motion.{:04d}.png'.format(idx-1)).resize((width, height), Image.ANTIALIAS) # change to idx+1
+  except:
+    break
 
-      flowImage = flow_img.resize((width, height), Image.ANTIALIAS) # resize style output image
-      
-      outputImage = Image.composite(styleImage, lastImage, flowImage)
-      lastImage = outputImage
+  if MASKING:
+    segMask = Image.open('/input/segments/segment.{:04d}.png'.format(idx))
+
+    outputMask = flowMask & segMask # merge style and flow images
   else:
-    outputImage = styleImage
-  
-  outputImage.save('/input/stylized/stylized.{:04d}.png'.format(idx))
+    outputMask = flowMask
+
+  lastImage = Image.composite(styleImage, lastImage, flowMask)
+  lastImage.save('/input/stylized/stylized.{:04d}.png'.format(idx+1))

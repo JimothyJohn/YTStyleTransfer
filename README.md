@@ -2,8 +2,11 @@
 Apply arbitrary styles to YouTube clips!
 
 Uses algorithms from:
+
 Optical Flow: [NVIDIA Flownet2](https://github.com/NVIDIA/flownet2-pytorch)
+
 Segmentation: [Facebook Detectron2](https://github.com/facebookresearch/detectron2)
+
 Style Transfer: [Google Magenta](https://tfhub.dev/google/magenta/arbitrary-image-stylization-v1-256/2)
 
 # Installation

@@ -6,28 +6,30 @@
 DIR=/input/
 
 # If frame directory doesn't exist
-if [[ -d "$DIR/flows" ]]
+if [[ -d "$DIR/flows/" ]]
 then
 # delete the previous frames
-rm -rf $DIR/flows
+rm -rf $DIR/flows/
 fi
 
 # make it
-mkdir $DIR/flows
+mkdir $DIR/flows/
 
 python3 ./main.py --inference --model FlowNet2 \
-    --save_flow --save $DIR/flows \
+    --save_flow --save $DIR/flows/ \
     --inference_dataset ImagesFromFolder \
-    --inference_dataset_root $DIR/.frames/ \
+    --inference_dataset_root $DIR/frames/ \
     --resume /flownet/FlowNet2_checkpoint.pth.tar
 
 # If frame directory exists
-if [[ -d "$DIR/motion" ]]
+if [[ -d "$DIR/motion/" ]]
 then
-# delete the previous frames
-rm -rf $DIR/motion
+    # delete the previous frames
+    rm -f $DIR/motion/*
+else
+    mkdir $DIR/motion # create target folder
 fi
 
-mkdir $DIR/motion
+python3 ./readmotion.py # create .png from flow data
 
-python3 ./readmotion.py
+rm -rf $DIR/flows/ $DIR/flowvis/ # delete unneeded directories
